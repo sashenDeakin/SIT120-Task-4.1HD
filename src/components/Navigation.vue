@@ -1,16 +1,18 @@
 <script setup>
-import { RouterLink } from "vue-router";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../firebase/init.js";
 import { ref } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import { auth } from "../firebase/init.js";
 
 const isOpen = ref(false);
 const rValue = ref(true);
+
+const router = useRouter();
 
 const email = ref("");
 const password = ref("");
@@ -41,6 +43,7 @@ const login = () => {
         alert(error.message);
       })
       .then(() => {
+        router.push("/");
         alert("Login Successfully");
       });
   } catch (error) {
@@ -63,6 +66,7 @@ const signup = () => {
             console.log(error.message);
           })
           .then(() => {
+            router.push("/");
             alert("SignUp successfully");
           });
       }
@@ -84,6 +88,7 @@ const loggedInOut = () => {
         name.value = "";
       })
       .then(() => {
+        router.push("/");
         alert("LoginOut Success!");
       });
   } catch (error) {
