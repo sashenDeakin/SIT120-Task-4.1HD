@@ -8,15 +8,19 @@
   <section class="about-us">
     <div class="row">
       <div class="about-col">
-        <h1>We are the world's largest university</h1>
+        <h1>
+          We are a diverse group of highly skilled and experienced freelancers
+        </h1>
         <p>
-          Universities are struggling to create facilities in a
-          technology-friendly environment across the campuses in multiple
-          locations. <br />There are a number of campus facilities that need to
-          support research, teaching, learning, and <br />other operations. The
-          mission of the university community is to provide <br />various
-          facilities and create an exceptional atmosphere <br />for students,
-          faculty, and staff.
+          In computing, a program is a specific set of ordered operations for a
+          computer to perform. In the modern computer that John von Neumann
+          outlined in 1945, the program contains a one-at-a-time sequence of
+          instructions that the computer follows. Typically, the program is put
+          into a storage area accessible to the computer. The computer gets one
+          instruction and performs it and then gets the next instruction. The
+          storage area or memory can also contain the data that the instruction
+          operates on. Note that a program is also a special kind of data that
+          indicates how to operate on application or user data.
         </p>
         <a href="" class="hero-btn red-btn">EXPLORE NOW</a>
       </div>

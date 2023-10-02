@@ -1,4 +1,36 @@
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import { db } from "../firebase/init";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
+const email = ref("");
+const name = ref("");
+const subject = ref("");
+const message = ref("");
+
+const sendMessage = async () => {
+  try {
+    const colRef = collection(db, "messages");
+
+    const blogObjects = {
+      name: name.value,
+      email: email.value,
+      subject: subject.value,
+      message: message.value,
+      timestamp: serverTimestamp(),
+    };
+
+    const dogRef = await addDoc(colRef, blogObjects);
+
+    name.value = "";
+    email.value = "";
+    subject.value = "";
+    message.value = "";
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+</script>
 
 <template>
   <section class="contact-header">
@@ -7,12 +39,13 @@
 
   <section class="location">
     <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d198740.83318956103!2d-77.1546608134622!3d38.89367081286511!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7c6de5af6e45b%3A0xc2524522d4885d2a!2sWashington%2C%20DC%2C%20USA!5e0!3m2!1sen!2slk!4v1645409707736!5m2!1sen!2slk"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12610.833975937734!2d144.93667917347165!3d-37.796870801674444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d283acb6965%3A0x5045675218ce760!2sNorth%20Melbourne%20VIC%203051!5e0!3m2!1sen!2sau!4v1696247279369!5m2!1sen!2sau"
       width="600"
       height="450"
       style="border: 0"
       allowfullscreen=""
       loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
     ></iframe>
   </section>
 
@@ -22,8 +55,8 @@
         <div>
           <i class="fa fa-home"></i>
           <span>
-            <h5>New York University #486-235 Bulding</h5>
-            <p>Sit Road.Azusa New York 34852</p>
+            <h5>88 Amberly Park Dr,</h5>
+            <p>Narre Warren South VIC 3805</p>
           </span>
         </div>
         <div>
@@ -36,32 +69,44 @@
         <div>
           <i class="fa fa-envelope-o"></i>
           <span>
-            <h5>NewYorkUniversit486@gmail.com</h5>
+            <h5>sashenjayathilaka486@gmail.com</h5>
             <p>Email us your query</p>
           </span>
         </div>
       </div>
       <div class="contact-col">
-        <form action="form-handler.php" method="post">
+        <form
+          @submit.prevent="sendMessage()"
+          action="form-handler.php"
+          method="post"
+        >
           <input
             type="text"
             name="name"
             placeholder="Enter Your Name"
             required
+            v-model="name"
           />
           <input
             type="email"
             name="email"
             placeholder="Enter Email Addres"
             required
+            v-model="email"
           />
           <input
             type="text"
             name="subject"
             placeholder="Enter Your Subject"
             required
+            v-model="subject"
           />
-          <textarea rows="8" name="message" placeholder="Message"></textarea>
+          <textarea
+            rows="8"
+            name="message"
+            placeholder="Message"
+            v-model="message"
+          ></textarea>
           <button type="submit" class="hero-btn red-btn">Send Message</button>
         </form>
       </div>

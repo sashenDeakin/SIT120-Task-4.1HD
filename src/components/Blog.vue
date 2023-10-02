@@ -1,5 +1,70 @@
 <script setup>
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+} from "firebase/firestore";
+import { ref } from "vue";
+import { auth, db } from "../firebase/init";
 import BlogForm from "./BlogForm.vue";
+
+const posts = ref([]);
+const isShow = ref(false);
+const currentId = ref("");
+const updateBlogName = ref("");
+const updateBlogDescription = ref("");
+const updateImage = ref("");
+
+const fetchPost = () => {
+  try {
+    onSnapshot(
+      query(collection(db, "blogs"), orderBy("timestamp", "desc")),
+      (snapshot) => {
+        posts.value = snapshot.docs;
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+fetchPost();
+
+const deleteBlogs = async (deleteId) => {
+  alert("Delete Doc");
+  await deleteDoc(doc(db, "blogs", deleteId));
+  fetchPost();
+};
+
+const onShow = (currentUpdateId) => {
+  isShow.value = true;
+  currentId.value = currentUpdateId;
+};
+
+const updateBlog = async (updateId) => {
+  try {
+    const docRef = doc(db, "blogs", updateId);
+
+    await updateDoc(docRef, {
+      blogName: updateBlogName.value,
+      blog: updateBlogDescription.value,
+      blogImage: updateImage.value,
+    });
+
+    fetchPost();
+  } catch (error) {
+    alert(error.message);
+  }
+
+  updateBlogName.value = "";
+  updateBlogDescription.value = "";
+  currentId.value = "";
+  updateImage.value = "";
+};
 </script>
 
 <template>
@@ -14,23 +79,77 @@ import BlogForm from "./BlogForm.vue";
         <h3>News & articles updates</h3>
       </div>
       <div class="content grid mtop">
-        <div class="box">
-          <div class="img">
-            <img
-              src="https://techlogitic.net/wp-content/uploads/2018/07/Freelancer.jpg"
-              alt=""
-            />
-            <span>HOTEL</span>
-          </div>
-          <div class="text">
-            <h3>Celebrating Decade Years Of Hotel In 2020</h3>
-            <p>
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-              officia deserunt mollit anim id est laborum.
-            </p>
-            <a href="#"
-              >Read More <i class="far fa-long-arrow-alt-right"></i>
-            </a>
+        <div v-for="(item, index) in posts" :key="index">
+          <div class="box">
+            <div class="img">
+              <img :src="item.data().blogImage" alt="" />
+              <span>Blog</span>
+            </div>
+            <div class="text">
+              <h3>{{ item.data().blogName }}</h3>
+              <p>
+                {{ item.data().blog }}
+              </p>
+              <a href="#"
+                >Read More <i class="far fa-long-arrow-alt-right"></i>
+              </a>
+            </div>
+            <div
+              class="button-contr"
+              v-if="auth.currentUser.photoURL === 'admin'"
+            >
+              <button
+                v-if="item.id !== currentId"
+                class="custom-button update"
+                href="#"
+                target="_blank"
+                @click="onShow(item.id)"
+              >
+                Update
+              </button>
+              <button
+                class="custom-button delete"
+                target="_blank"
+                @click="deleteBlogs(item.id)"
+              >
+                Delete
+              </button>
+            </div>
+            <Transition>
+              <div v-if="isShow" style="margin-top: 10px">
+                <div class="input-container" v-if="item.id === currentId">
+                  <div class="input-wrapper">
+                    <label for="name">Blog Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      :placeholder="item.data().blogName"
+                      v-model="updateBlogName"
+                    />
+                  </div>
+                  <div class="input-wrapper">
+                    <label for="message">Blog Description</label>
+                    <textarea
+                      id="message"
+                      :placeholder="item.data().blog"
+                      v-model="updateBlogDescription"
+                    ></textarea>
+                  </div>
+                  <div class="input-wrapper">
+                    <label for="text">Blog Image</label>
+                    <input
+                      type="text"
+                      id="image"
+                      placeholder="Blog Image Url"
+                      v-model="updateImage"
+                    />
+                  </div>
+                  <button type="submit" @click="updateBlog(item.id)">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>
@@ -52,6 +171,40 @@ import BlogForm from "./BlogForm.vue";
 }
 .contact-header h1 {
   padding-top: 350px;
+}
+
+.custom-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.update {
+  background-color: #3498db;
+}
+
+.delete {
+  background-color: #ff5e62;
+}
+
+/* Hover effect */
+.custom-button:hover {
+  background-color: #2980b9;
 }
 
 .grid {
@@ -150,5 +303,71 @@ import BlogForm from "./BlogForm.vue";
 .blog a {
   color: #cc8c18;
   font-size: 15px;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column; /* Changed from 'row' to 'column' */
+  gap: 10px;
+}
+
+.input-wrapper {
+  flex: 1;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+  border-color: #007bff;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .input-container {
+    flex-direction: column;
+  }
 }
 </style>

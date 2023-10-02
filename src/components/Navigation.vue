@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../firebase/init.js";
 import { ref } from "vue";
@@ -56,7 +57,6 @@ const signup = () => {
     createUserWithEmailAndPassword(auth, email.value, password.value).then(
       () => {
         updateProfile(auth.currentUser, {
-          displayName: userName.value,
           photoURL: userType.value,
         })
           .catch((error) => {
@@ -136,22 +136,24 @@ if (auth.currentUser) {
                 <RouterLink to="/contact">CONTACT</RouterLink></a
               >
             </li>
-            <li
-              v-if="!name"
-              class="nav-item"
-              @click="open()"
-              style="cursor: pointer"
-            >
-              <p class="nav-link" href="" id="login-btn">LOGIN</p>
-            </li>
-            <li
-              v-else
-              @click="loggedInOut()"
-              class="nav-item"
-              style="cursor: pointer"
-            >
-              <p id="login-btn" class="nav-link">SIGN OUT</p>
-            </li>
+            <Transition name="bounce">
+              <li
+                v-if="!name"
+                class="nav-item"
+                @click="open()"
+                style="cursor: pointer"
+              >
+                <p class="nav-link" href="" id="login-btn">LOGIN</p>
+              </li>
+              <li
+                v-else
+                @click="loggedInOut()"
+                class="nav-item"
+                style="cursor: pointer"
+              >
+                <p id="login-btn" class="nav-link">SIGN OUT</p>
+              </li>
+            </Transition>
           </ul>
         </div>
       </div>
@@ -374,5 +376,23 @@ select {
 .btn:hover {
   background: rgba(250, 0, 0, 0.09);
   color: #f70d1a;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

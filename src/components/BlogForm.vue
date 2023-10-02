@@ -1,64 +1,74 @@
 <script setup>
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref } from "vue";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
-import { db, storage } from "../firebase/init";
-import { getDownloadURL, uploadString } from "firebase/storage";
+import { auth, db } from "../firebase/init";
 
-const userName = ref("");
 const blogName = ref("");
 const blogDes = ref("");
-const blogImage = ref(null);
-
-const handleFileChange = (event) => {
-  const selectedFile = event.target.files[0];
-  blogImage.value = selectedFile;
-};
+const blogImage = ref("");
 
 const createBlogPost = async () => {
   try {
-    const docRef = await addDoc(collection(db, "blogs"), {
-      userName: userName.value,
+    const colRef = collection(db, "blogs");
+
+    const blogObjects = {
       blogName: blogName.value,
       blog: blogDes.value,
       blogImage: blogImage.value,
       timestamp: serverTimestamp(),
-    });
+    };
+
+    const dogRef = await addDoc(colRef, blogObjects);
 
     blogName.value = "";
     blogDes.value = "";
-    blogImage.value = null;
+    blogImage.value = "";
   } catch (error) {
     console.log(error.message);
   }
 };
+
+/* console.log(auth.currentUser); */
 </script>
 
 <template>
-  <div class="container">
-    <h1>Contact Us</h1>
-    <form>
+  <div
+    class="container"
+    style="margin-top: 40px"
+    v-if="auth.currentUser.photoURL === 'admin'"
+  >
+    <h1>Create Blogs</h1>
+    <div>
       <div class="input-container">
         <div class="input-wrapper">
-          <label for="name">Name</label>
-          <input type="text" id="name" placeholder="Your Name" />
+          <label for="name">Blog Name</label>
+          <input
+            type="text"
+            id="name"
+            placeholder="Blog Name"
+            v-model="blogName"
+          />
         </div>
         <div class="input-wrapper">
-          <label for="message">Message</label>
-          <textarea id="message" placeholder="Your Message"></textarea>
+          <label for="message">Blog Description</label>
+          <textarea
+            id="message"
+            placeholder="Blog Description"
+            v-model="blogDes"
+          ></textarea>
         </div>
         <div class="input-wrapper">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Your Email" />
+          <label for="email">Blog Image</label>
+          <input
+            type="text"
+            id="image"
+            placeholder="Blog Image Url"
+            v-model="blogImage"
+          />
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit" @click="createBlogPost()">Submit</button>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
