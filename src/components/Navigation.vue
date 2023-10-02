@@ -126,7 +126,7 @@ if (auth.currentUser) {
                 <RouterLink to="/about">ABOUT US </RouterLink></a
               >
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="auth.currentUser">
               <a class="nav-link" href="#services"
                 ><RouterLink to="/blog">BLOG</RouterLink></a
               >
