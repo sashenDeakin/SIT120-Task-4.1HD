@@ -4,9 +4,6 @@
   <section id="testimonials">
     <div class="container">
       <h1>Testimonials</h1>
-      <p class="text-center">
-        Subcribe Easy Tutorilas Youtube Channel To Watch More Videos
-      </p>
       <div class="row">
         <div class="col-md-4 text-center">
           <div class="profile">
