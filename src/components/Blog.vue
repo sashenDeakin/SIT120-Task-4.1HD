@@ -213,6 +213,14 @@ button {
   grid-gap: 30px;
 }
 
+@media (max-width: 768px) {
+  .grid {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+}
+
 .container {
   max-width: 90%;
   margin: auto;
